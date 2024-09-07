@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Iván Uría",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "graphql": "^16.9.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.1",
+    "mongoose-autopopulate": "^1.1.0",
+    "mongoose-unique-validator": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
