@@ -28,7 +28,8 @@ const Author = require('../models/author')
   },
 ]*/
 
-const editAuthor = async (root, { name, setBornTo }) => {
+const editAuthor = async (root, { name, setBornTo }, { currentUser, requireLogin }) => {
+  requireLogin(currentUser)
   let editedAuthor
   try {
     editedAuthor = await Author.findOneAndUpdate(

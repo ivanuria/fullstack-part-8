@@ -77,7 +77,8 @@ const filterBooks = async (root, { author, genre }) => {
   return await Book.find(filter)
 }
 
-const addBook = async (root, { title, published, author, genres }) => {
+const addBook = async (root, { title, published, author, genres }, { currentUser, requireLogin }) => {
+  requireLogin(currentUser)
   let savedAuthor = await Author.findOne({ name: author }) // using findOneAndUpdate to achieve this is buggy due to validations
   if (!savedAuthor) {
     try {
@@ -101,7 +102,6 @@ const addBook = async (root, { title, published, author, genres }) => {
     parseErrors(error)
   }
 
-  await newBook
   return newBook
 }
 
