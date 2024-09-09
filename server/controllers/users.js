@@ -65,7 +65,9 @@ const login = async (root, { username, password }) => {
 
   return {
     value: token,
-    expires: expires.toISOString()
+    expires: expires.toISOString(),
+    username: loginUser.username,
+    name: loginUser.name
   }
 }
 

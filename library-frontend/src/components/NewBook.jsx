@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { ADD_BOOK, ALL_AUTHORS, ALL_BOOKS } from '../controllers/queries'
-import useStore from '../controllers/store'
+import useStore from '../controllers/useStore'
 import { useNavigate } from 'react-router-dom'
 //MUI
 import {

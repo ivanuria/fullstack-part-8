@@ -1,7 +1,8 @@
-import Authors from "./components/Authors";
-import Books from "./components/Books";
-import NewBook from "./components/NewBook";
-import Message from "./components/Message";
+import Authors from './components/Authors'
+import Books from './components/Books'
+import NewBook from './components/NewBook'
+import Message from './components/Message'
+import Login from './components/Login'
 
 import {
   Container,
@@ -24,6 +25,7 @@ const App = () => {
             <Route path='/' element={<Authors />} />
             <Route path='/books' element={<Books />} />
             <Route path='/books/add' element={<NewBook />} />
+            <Route path='/login' element={<Login />} />
           </Routes>
       </Container>
       <Message />

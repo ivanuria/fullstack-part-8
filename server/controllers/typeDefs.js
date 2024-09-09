@@ -20,7 +20,9 @@ const typeDefs = `
   }
   type Token {
     value: String!,
-    expires: String!
+    expires: String!,
+    username: String!,
+    name: String!
   }
 
   type Query {

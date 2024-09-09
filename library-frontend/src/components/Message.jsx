@@ -1,4 +1,4 @@
-import useStore from '../controllers/store'
+import useStore from '../controllers/useStore'
 import { useEffect } from 'react'
 import {
   Alert,

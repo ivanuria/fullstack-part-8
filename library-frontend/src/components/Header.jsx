@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Box,
   Button,
   Container,
   Toolbar
@@ -11,6 +12,12 @@ import {
   AutoStoriesTwoTone as Logo
 } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
+import useLoggedUser from '../utils/useLoggedUser'
+
+const ConditionedButton = ({ condition=true, ...props }) => {
+  if (!condition) return null
+  return <Button {...props} />
+}
 
 const Header = () => {
   const scrollTrigger = useScrollTrigger({
@@ -18,6 +25,8 @@ const Header = () => {
     threshold: 90,
     target: window,
   })
+  const { name, saveLogout } = useLoggedUser()
+
   return (
     <AppBar
       position='sticky'
@@ -31,43 +40,73 @@ const Header = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           paddingInline: '0'
         }}
-
-      > <Logo
+      >
+        <Box
           sx={{
-            width: '3rem',
-            height: '3rem'
-          }}
-        />
-        <Toolbar
-          variant='dense'
-          sx={{
-            gap: '1rem'
+            display: 'flex',
+            alignItems: 'center',
+            paddingInline: '0'
           }}
         >
-          <Button
-            component={Link}
-            to='/'
-            color='inherit'
+          <Logo
+            sx={{
+              width: '3rem',
+              height: '3rem'
+            }}
+          />
+          <Toolbar
+            variant='dense'
+            sx={{
+              gap: '1rem'
+            }}
           >
-            Authors
-          </Button>
-          <Button
+            <ConditionedButton
+              component={Link}
+              to='/'
+              color='inherit'
+            >
+              Authors
+            </ConditionedButton>
+            <ConditionedButton
+              component={Link}
+              to='/books'
+              color='inherit'
+            >
+              Books
+            </ConditionedButton>
+            <ConditionedButton
+              component={Link}
+              to='/books/add'
+              color='inherit'
+              condition={name}
+            >
+              Add Book
+            </ConditionedButton>
+          </Toolbar>
+        </Box>
+        <Box>
+          <ConditionedButton
             component={Link}
-            to='/books'
+            to='/login'
             color='inherit'
+            condition={!name}
+            variant='outlined'
           >
-            Books
-          </Button>
-          <Button
+            Login
+          </ConditionedButton>
+          <ConditionedButton
             component={Link}
-            to='/books/add'
+            onClick={saveLogout}
             color='inherit'
+            condition={name}
+            variant='outlined'
           >
-            Add Book
-          </Button>
-        </Toolbar>
+            Logout
+          </ConditionedButton>
+        </Box>
       </Container>
     </AppBar>
   )

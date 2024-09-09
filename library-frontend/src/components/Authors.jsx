@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../controllers/queries'
-import useStore from '../controllers/store'
+import useStore from '../controllers/useStore'
 // MUI
 import {
   Box,
