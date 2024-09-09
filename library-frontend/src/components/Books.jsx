@@ -53,7 +53,7 @@ const Books = () => {
               : query.data.allBooks.map((a) => (
                 <TableRow key={`${a.title}-${a.author}`}>
                   <TableCell>{a.title}</TableCell>
-                  <TableCell>{a.author}</TableCell>
+                  <TableCell>{a.author.name}</TableCell>
                   <TableCell>{a.published}</TableCell>
                 </TableRow>
               ))

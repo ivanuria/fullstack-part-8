@@ -4,20 +4,29 @@ import '@fontsource/mynerve'
 
 let theme = createTheme({
   cssVariables: true,
-  palette: {
-    primary: {
-      main: 'hsl(280, 50%, 45%)'
-    },
-    secondary: {
-      main : 'hsl(73, 50%, 45%)'
-    },
+  colorSchemes: {
     dark: {
-      light: 'hsl(280, 50%, 45%)',
-      main: 'hsl(280, 50%, 14.624999999999998%)',
-      dark: 'hsl(280, 50%, 0%)',
-      contrastText: '#fff'
+      palette: {
+        primary: {
+          main: 'hsl(280, 50%, 75%)'
+        },
+        secondary: {
+          main : 'hsl(73, 50%, 75%)'
+        },
+        tonalOffset: 0.45,
+      },
     },
-    tonalOffset: 0.45,
+    light: {
+      palette: {
+        primary: {
+          main: 'hsl(280, 50%, 45%)'
+        },
+        secondary: {
+          main : 'hsl(73, 50%, 45%)'
+        },
+        tonalOffset: 0.45,
+      }
+    }
   },
   typography: {
     fontFamily: 'Nanum Gothic, sans serif',
@@ -46,7 +55,7 @@ let theme = createTheme({
               style: {
                 marginBlock: '2rem',
                 fontWeight: '700',
-                color: 'var(--mui-palette-dark-main)'
+                color: 'var(--mui-palette-primary-main)'
               }
             }
           ]
