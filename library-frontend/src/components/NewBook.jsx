@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { ADD_BOOK, ALL_AUTHORS, ALL_BOOKS } from '../controllers/queries'
 import useStore from '../controllers/useStore'
@@ -20,7 +21,7 @@ const NewBook = () => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const navigate = useNavigate()
-  const { setError, setSuccess } = useStore()
+  const { setError, setSuccess, userName } = useStore()
 
   const [createBook] = useMutation(ADD_BOOK, {
     onError: error => {
@@ -53,6 +54,10 @@ const NewBook = () => {
     setGenres(genres.concat(genre))
     setGenre('')
   }
+
+  useEffect(() => {
+    if (!userName) navigate('/')
+  }, [userName])
 
   return (
     <>

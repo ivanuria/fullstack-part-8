@@ -12,10 +12,10 @@ const useLoggedUser = () => {
     setUserExpires
   } = useStore()
 
-  const saveLogin = ({ username, name, token, expires }) => {
+  const saveLogin = ({ username, name, value, expires }) => {
     setUserUsername(username)
     setUserName(name)
-    setUserToken(token)
+    setUserToken(value)
     setUserExpires(expires)
   }
 

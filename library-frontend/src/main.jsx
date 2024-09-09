@@ -2,13 +2,36 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import { ApolloProvider, InMemoryCache, ApolloClient } from "@apollo/client";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import {
+  ApolloProvider,
+  InMemoryCache,
+  ApolloClient,
+  createHttpLink,
+} from "@apollo/client";
+import { setContext } from '@apollo/client/link/context'
+import { ThemeProvider, CssBaseline, } from "@mui/material";
 import theme from './theme'
 
-const client = new ApolloClient({
+console.log("state", JSON.parse(localStorage.getItem('libraryApp')).state)
+
+const authLink = setContext((_, { headers }) => {
+  const data = JSON.parse(localStorage.getItem('libraryApp'))
+  const token = data.state.userToken
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : null,
+    }
+  }
+})
+
+const httpLink = createHttpLink({
   uri: 'http://localhost:4000',
-  cache: new InMemoryCache()
+})
+
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: authLink.concat(httpLink),
 })
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -1,3 +1,7 @@
+import { useEffect } from 'react'
+import { Link, useSearchParams, useLocation } from 'react-router-dom'
+import useLoggedUser from '../utils/useLoggedUser'
+//MUI
 import {
   AppBar,
   Box,
@@ -5,14 +9,8 @@ import {
   Container,
   Toolbar
 } from '@mui/material'
-import {
-  useScrollTrigger
-} from '@mui/material'
-import {
-  AutoStoriesTwoTone as Logo
-} from '@mui/icons-material'
-import { Link } from 'react-router-dom'
-import useLoggedUser from '../utils/useLoggedUser'
+import { useScrollTrigger } from '@mui/material'
+import { AutoStoriesTwoTone as Logo } from '@mui/icons-material'
 
 const ConditionedButton = ({ condition=true, ...props }) => {
   if (!condition) return null
@@ -26,6 +24,9 @@ const Header = () => {
     target: window,
   })
   const { name, saveLogout } = useLoggedUser()
+  const location = useLocation()
+
+  const params = new URLSearchParams({  redirect: location.pathname })
 
   return (
     <AppBar
@@ -90,7 +91,7 @@ const Header = () => {
         <Box>
           <ConditionedButton
             component={Link}
-            to='/login'
+            to={`/login?${params}`}
             color='inherit'
             condition={!name}
             variant='outlined'

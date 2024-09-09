@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { LOGIN } from "../controllers/queries"
 import { useMutation } from "@apollo/client"
 import useStore from "../controllers/useStore"
@@ -20,8 +20,10 @@ const Login = ({}) => {
   const { setError, setSuccess } = useStore()
   const navigate = useNavigate()
   const { name, saveLogin } = useLoggedUser()
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
 
-  console.log('name', name)
+  console.log('params', searchParams)
   const [login, result] = useMutation(LOGIN, {
     onError: error => {
       setError(error.graphQLErrors[0].message)
@@ -35,7 +37,7 @@ const Login = ({}) => {
   })
 
   useEffect(() => {
-    if (name) navigate('/')
+    if (name) navigate(redirectTo || '/')
   }, [name])
 
   const submit = event => {

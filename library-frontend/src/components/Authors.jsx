@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../controllers/queries'
 import useStore from '../controllers/useStore'
+import useLoggedUser from '../utils/useLoggedUser'
 // MUI
 import {
   Box,
@@ -21,10 +22,12 @@ import {
 } from '@mui/icons-material'
 import TableMock from './Skeletons/TableMock'
 
+
 const SetBorn = ({ name, born }) => {
   const [newBorn, setNewBorn] = useState(born || '')
   const [focused, setFocused] = useState(false)
   const { setError, setSuccess } = useStore()
+  const { name:userName } = useLoggedUser()
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
       onError: error => {
@@ -48,6 +51,18 @@ const SetBorn = ({ name, born }) => {
 
   const onSave = () => {
     editAuthor({ variables: { name, setBornTo: parseInt(newBorn) } })
+  }
+  if (!userName) {
+    return (
+      <TableCell
+        sx={{
+          position: 'relative',
+          cursor: 'pointer'
+        }}
+      >
+      {newBorn}
+      </TableCell>
+    )
   }
 
   if (focused) {
