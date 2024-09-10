@@ -86,6 +86,14 @@ const Header = () => {
             >
               Add Book
             </ConditionedButton>
+            <ConditionedButton
+              component={Link}
+              to='/books/recommended'
+              color='inherit'
+              condition={name}
+            >
+              Recommended Books
+            </ConditionedButton>
           </Toolbar>
         </Box>
         <Box>

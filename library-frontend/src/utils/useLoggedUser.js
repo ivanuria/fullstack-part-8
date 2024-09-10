@@ -6,17 +6,20 @@ const useLoggedUser = () => {
     userToken,
     userUsername,
     userExpires,
+    userGenre,
     setUserUsername,
     setUserName,
     setUserToken,
-    setUserExpires
+    setUserExpires,
+    setUserGenre
   } = useStore()
 
-  const saveLogin = ({ username, name, value, expires }) => {
+  const saveLogin = ({ username, name, value, expires, genre }) => {
     setUserUsername(username)
     setUserName(name)
     setUserToken(value)
     setUserExpires(expires)
+    setUserGenre(genre)
   }
 
   const saveLogout = () => {
@@ -24,6 +27,7 @@ const useLoggedUser = () => {
     setUserName('')
     setUserToken('')
     setUserExpires('')
+    setUserGenre('')
   }
 
   return {
@@ -31,6 +35,7 @@ const useLoggedUser = () => {
     token: userToken,
     username: userUsername,
     expires: userExpires,
+    favouriteGenre: userGenre,
     saveLogin,
     saveLogout
   }

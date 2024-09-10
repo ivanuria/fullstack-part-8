@@ -7,6 +7,7 @@ const useStore = create(persist(
       userToken: '',
       userUsername: '',
       userExpires: '',
+      userGenre: '',
       message: '',
       openMessage: false,
       severityMessage: '',
@@ -17,6 +18,7 @@ const useStore = create(persist(
       setUserToken: (token) => set(state => ({ userToken: token })),
       setUserUsername: (name) => set(state => ({ userUsername: name })),
       setUserExpires: (token) => set(state => ({ userExpires: token })),
+      setUserGenre: (genre) => set(state => ({ userGenre: genre })),
     }),
     {
       name: 'libraryApp',

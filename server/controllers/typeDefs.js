@@ -22,7 +22,11 @@ const typeDefs = `
     value: String!,
     expires: String!,
     username: String!,
-    name: String!
+    name: String!,
+    genre: String!,
+  }
+  type Genre {
+    value: [String!]!
   }
 
   type Query {
@@ -30,6 +34,7 @@ const typeDefs = `
     authorCount: Int
     allBooks(author: String, genre: String): [Book]
     allAuthors: [Author]
+    allGenres: Genre
     me: User
   }
 

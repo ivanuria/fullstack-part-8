@@ -9,6 +9,7 @@ const resolvers = {
     allBooks: booksController.filterBooks,
     allAuthors: authorsController.allAuthors,
     me: usersController.me,
+    allGenres: booksController.allGenres,
   },
   Mutation: {
     addBook: booksController.addBook,

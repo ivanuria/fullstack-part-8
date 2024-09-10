@@ -25,6 +25,7 @@ const App = () => {
             <Route path='/' element={<Authors />} />
             <Route path='/books' element={<Books />} />
             <Route path='/books/add' element={<NewBook />} />
+            <Route path='/books/recommended' element={<Books recommended={true} />} />
             <Route path='/login' element={<Login />} />
           </Routes>
       </Container>

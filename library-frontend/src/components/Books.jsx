@@ -1,9 +1,14 @@
+import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import { ALL_BOOKS } from '../controllers/queries'
+import { ALL_BOOKS, ALL_GENRES } from '../controllers/queries'
+import useLoggedUser from '../utils/useLoggedUser'
 // MUI
 import {
   Box,
+  Grid2,
   Paper,
+  Select,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -14,8 +19,35 @@ import {
 } from '@mui/material'
 import TableMock from './Skeletons/TableMock'
 
-const Books = () => {
-  const query = useQuery(ALL_BOOKS)
+const Books = ({ recommended=false }) => {
+  const {favouriteGenre} = useLoggedUser()
+  const [lastGenre, setLastGenre] = useState('')
+  const [genre, setGenre] = useState(
+    recommended
+    ? favouriteGenre
+    : lastGenre
+  )
+  const genres = useQuery(ALL_GENRES)
+  const query = useQuery(ALL_BOOKS, {
+    variables: { genre: genre }
+  })
+
+  useEffect(() => {
+    setGenre(
+      recommended
+      ? favouriteGenre
+      : lastGenre
+    )
+  }, [recommended])
+  useEffect(() => {
+    setLastGenre(
+      recommended
+      ? lastGenre
+      : genre
+    )
+  }, [genre])
+
+  console.log(query)
 
   return (
     <Box>
@@ -25,6 +57,56 @@ const Books = () => {
       >
         Books
       </Typography>
+
+        {
+          recommended
+        ? <Typography
+            variant='h6'
+            sx={{
+              marginBlockEnd: '1rem'
+            }}
+          >
+            Filtered by your favourite genre {genre}:
+          </Typography>
+        : <Grid2
+            container
+          >
+          <Typography
+            variant='h6'
+            component='label'
+            htmlFor='genre'
+          >
+            Filtered by Genre:
+          </Typography>
+          <Select
+            value={genre}
+            label=''
+            id='genre'
+            onChange={({ target }) => setGenre(target.value)}
+            color='secondary'
+            sx={{
+              display: 'inline',
+              width: '100%',
+              textTransform: 'capitalize',
+              marginBlockEnd: '2rem',
+            }}
+          >
+            {
+              !genres.loading &&
+              genres.data.allGenres.value.map(g =>
+                <MenuItem
+                  value={g}
+                  sx={{
+                    textTransform: 'capitalize'
+                  }}
+                >
+                  {g}
+                </MenuItem>
+              )
+            }
+          </Select>
+          </Grid2>
+        }
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
