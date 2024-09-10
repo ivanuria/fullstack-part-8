@@ -21,14 +21,13 @@ const filterBooks = async (root, { author, genre }) => {
   }
   if (genre) {
     filter = { ...filter, genres: { $in: RegExp('^'+genre+'$', 'i') } }
-    console.log(filter)
   }
   return await Book.find(filter)
 }
 
 const addBook = async (root, { title, published, author, genres }, { currentUser, requireLogin }) => {
   requireLogin(currentUser)
-  let savedAuthor = await Author.findOne({ name: author }) // using findOneAndUpdate to achieve this is buggy due to validations
+  let savedAuthor = await Author.findOne({ name: new RegExp('^'+author.trim('')+'$', 'i') }) // using findOneAndUpdate to achieve this is buggy due to validations
   if (!savedAuthor) {
     try {
       savedAuthor = new Author({ name: author })

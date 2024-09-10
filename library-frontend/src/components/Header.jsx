@@ -99,7 +99,7 @@ const Header = () => {
         <Box>
           <ConditionedButton
             component={Link}
-            to={`/login?${params}`}
+            to={`/login?${params.toString()}`}
             color='inherit'
             condition={!name}
             variant='outlined'

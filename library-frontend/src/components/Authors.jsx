@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../controllers/queries'
+import { useNavigate, useLocation } from 'react-router-dom'
 import useStore from '../controllers/useStore'
 import useLoggedUser from '../utils/useLoggedUser'
 // MUI
@@ -27,11 +28,18 @@ const SetBorn = ({ name, born }) => {
   const [newBorn, setNewBorn] = useState(born || '')
   const [focused, setFocused] = useState(false)
   const { setError, setSuccess } = useStore()
-  const { name:userName } = useLoggedUser()
+  const { name:userName, saveLogout } = useLoggedUser()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const params = new URLSearchParams({  redirect: location.pathname })
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
-      onError: error => {
+      onError: async (error) => {
         const messages = error.graphQLErrors.map(e => e.message).join('\n')
+        if (error.message.toLowerCase().includes('unauthorised')) {
+          await saveLogout()
+          navigate(`/login?${params.toString()}`)
+        }
         setError(messages)
       },
       onCompleted: () => {

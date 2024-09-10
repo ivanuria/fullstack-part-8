@@ -8,7 +8,7 @@ const typeDefs = `
   type Book {
     title: String!,
     published: Int!,
-    author: Author!,
+    author: Author,
     id: ID!,
     genres: [String!]!
   }

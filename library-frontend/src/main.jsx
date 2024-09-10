@@ -12,8 +12,6 @@ import { setContext } from '@apollo/client/link/context'
 import { ThemeProvider, CssBaseline, } from "@mui/material";
 import theme from './theme'
 
-console.log("state", JSON.parse(localStorage.getItem('libraryApp')).state)
-
 const authLink = setContext((_, { headers }) => {
   const data = JSON.parse(localStorage.getItem('libraryApp'))
   const token = data.state.userToken

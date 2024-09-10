@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import { ALL_BOOKS, ALL_GENRES } from '../controllers/queries'
+import { useLocation, useNavigate } from 'react-router-dom'
 import useLoggedUser from '../utils/useLoggedUser'
+import useStore from '../controllers/useStore'
 // MUI
 import {
   Box,
@@ -19,35 +21,47 @@ import {
 } from '@mui/material'
 import TableMock from './Skeletons/TableMock'
 
-const Books = ({ recommended=false }) => {
-  const {favouriteGenre} = useLoggedUser()
-  const [lastGenre, setLastGenre] = useState('')
-  const [genre, setGenre] = useState(
-    recommended
-    ? favouriteGenre
-    : lastGenre
-  )
+const Books = ({ recommended }) => {
+  const {favouriteGenre, expires, saveLogout} = useLoggedUser()
+  const {filteredGenre:genre, setFilteredGenre:setGenre} = useStore()
+  const [lastGenre, setLastGenre] = useState(genre)
   const genres = useQuery(ALL_GENRES)
-  const query = useQuery(ALL_BOOKS, {
-    variables: { genre: genre }
-  })
+  const queryOptions = {
+    variables: { genre: genre },
+    fetchPolicy: 'cache-and-network' // https://www.apollographql.com/docs/react/data/queries/#configuring-fetch-logic
+  }
+  const query = useQuery(ALL_BOOKS, genre ? queryOptions : {})
+  const navigate = useNavigate()
+  const location = useLocation()
+  const params = new URLSearchParams({  redirect: location.pathname })
 
   useEffect(() => {
-    setGenre(
-      recommended
-      ? favouriteGenre
-      : lastGenre
-    )
+    if (recommended !== null) {
+      setGenre(
+        recommended
+        ? favouriteGenre
+        : lastGenre
+      )
+    }
   }, [recommended])
   useEffect(() => {
-    setLastGenre(
-      recommended
-      ? lastGenre
-      : genre
-    )
+    if (recommended !== null) {
+      setLastGenre(
+        recommended
+        ? lastGenre
+        : genre
+      )
+    }
   }, [genre])
-
-  console.log(query)
+  useEffect(() => {
+    const fn = async () => {
+      if (recommended && expires <= new Date()) {
+        await saveLogout()
+        navigate(`/login?${params.toString()}`)
+      }
+    }
+    fn()
+  })
 
   return (
     <Box>
@@ -91,10 +105,19 @@ const Books = ({ recommended=false }) => {
               marginBlockEnd: '2rem',
             }}
           >
+            <MenuItem
+              key=''
+              value=''
+              sx={{
+                textTransform: 'capitalize'
+              }}
+            >
+              All the genres
+            </MenuItem>
             {
-              !genres.loading &&
-              genres.data.allGenres.value.map(g =>
+              genres.loading ? null : genres.data.allGenres.value.map(g =>
                 <MenuItem
+                  key={g}
                   value={g}
                   sx={{
                     textTransform: 'capitalize'
@@ -135,7 +158,7 @@ const Books = ({ recommended=false }) => {
               : query.data.allBooks.map((a) => (
                 <TableRow key={`${a.title}-${a.author}`}>
                   <TableCell>{a.title}</TableCell>
-                  <TableCell>{a.author.name}</TableCell>
+                  <TableCell>{a.author && a.author.name}</TableCell>
                   <TableCell>{a.published}</TableCell>
                 </TableRow>
               ))

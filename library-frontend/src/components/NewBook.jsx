@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
-import { ADD_BOOK, ALL_AUTHORS, ALL_BOOKS } from '../controllers/queries'
+import { ADD_BOOK, ALL_AUTHORS, ALL_BOOKS, ALL_GENRES } from '../controllers/queries'
 import useStore from '../controllers/useStore'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import useLoggedUser from '../utils/useLoggedUser'
 //MUI
 import {
   Button,
@@ -22,10 +23,20 @@ const NewBook = () => {
   const [genres, setGenres] = useState([])
   const navigate = useNavigate()
   const { setError, setSuccess, userName } = useStore()
+  const { saveLogout } = useLoggedUser()
+
+  const location = useLocation()
+  const params = new URLSearchParams({
+    redirect: location
+  })
 
   const [createBook] = useMutation(ADD_BOOK, {
-    onError: error => {
+    onError: async (error) => {
       const messages = error.graphQLErrors.map(e => e.message).join('\n')
+      if (error.message.toLowerCase().includes('unauthorised')) {
+        await saveLogout()
+        navigate(`/login?${params.toString()}`)
+      }
       setError(messages)
     },
     onCompleted: () => {
@@ -37,16 +48,54 @@ const NewBook = () => {
       setGenre('')
       navigate('/books')
     },
-    refetchQueries: [
-      { query: ALL_AUTHORS },
-      { query: ALL_BOOKS }
-    ]
+    update: async (cache, { data }) => {
+      // Update Authors // It works, but not if Authors aren't fetched before
+      await cache.updateQuery({ query: ALL_AUTHORS }, (store) => {
+        const allAuthors = store && store.allAuthors
+        if (allAuthors) {
+          const newAuthor = data.addBook.author
+          if (allAuthors.find(author => author.id === newAuthor.id)) {
+            return {
+              allAuthors:
+                allAuthors.map(author =>
+                author.id !== newAuthor.id
+                ? author
+                : newAuthor
+              )
+            }
+          }
+          return {
+            allAuthors: allAuthors.concat(newAuthor)
+          }
+        }
+      })
+      // Update Genres
+      await cache.updateQuery({ query: ALL_GENRES }, (store) => {
+        const allGenres = store && store.allGenres
+        if (allGenres) {
+          let newGenres = [...allGenres.value]
+          for (let genre of data.addBook.genres) {
+            newGenres.push(genre.toLowerCase())
+          }
+          newGenres = [...new Set(newGenres)]
+          newGenres.sort()
+          return {
+            allGenres: { __typename: 'Genre', value: newGenres }
+          }
+        }
+      })
+      // Update Books
+      await cache.updateQuery({ query: ALL_BOOKS }, (store) => {
+        const allBooks = store && store.allBooks
+        if (allBooks) {
+          return { allBooks: allBooks.concat(data.addBook) }
+        }
+      })
+    }
   })
 
   const submit = async (event) => {
     event.preventDefault()
-
-    console.log('add book...')
     createBook({ variables: { title, author, published: parseInt(published), genres } })
   }
 
@@ -94,6 +143,12 @@ const NewBook = () => {
                 label='Genre'
                 value={genre}
                 onChange={({ target }) => setGenre(target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    addGenre()
+                  }
+                }}
               />
             </Grid2>
             <Grid2 size={4}>
