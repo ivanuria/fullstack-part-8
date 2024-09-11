@@ -15,7 +15,7 @@ const schema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Author',
-    autopopulate: true
+    autopopulate: { maxDepth: 1 } // Disable the Author count in this view
   },
   genres: [
     { type: String }

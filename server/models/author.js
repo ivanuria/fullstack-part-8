@@ -20,7 +20,7 @@ schema.virtual('bookCount', {
   localField: '_id',
   foreignField: 'author',
   count: true,
-  autopopulate: true
+  autopopulate: { maxDepth: 1 } // n+1 problem was attended first-hand. I had a problem with depth.
 })
 
 schema.plugin(uniqueValidator)

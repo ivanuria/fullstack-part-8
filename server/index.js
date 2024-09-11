@@ -32,6 +32,8 @@ const requireLogin = user => {
   }
 }
 
+mongoose.set('debug', true)
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
