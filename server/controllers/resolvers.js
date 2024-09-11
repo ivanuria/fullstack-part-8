@@ -16,6 +16,10 @@ const resolvers = {
     editAuthor: authorsController.editAuthor,
     createUser: usersController.createUser,
     login: usersController.login,
+  },
+  Subscription: {
+    bookAdded: booksController.bookAdded,
+    authorEdited: authorsController.authorEdited,
   }
 }
 

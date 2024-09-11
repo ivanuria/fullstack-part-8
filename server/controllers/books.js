@@ -1,5 +1,8 @@
 const parseErrors = require('./parseErrors')
 
+const { PubSub } = require('graphql-subscriptions')
+const pubSub = new PubSub()
+
 const Book = require('../models/book')
 const Author = require('../models/author')
 
@@ -50,6 +53,8 @@ const addBook = async (root, { title, published, author, genres }, { currentUser
     parseErrors(error)
   }
 
+  pubSub.publish('BOOK_ADDED', { bookAdded: newBook })
+
   return newBook
 }
 
@@ -66,9 +71,14 @@ const allGenres = async () => {
   return { value: genresToReturn }
 }
 
+const bookAdded = {
+  subscribe: () => pubSub.asyncIterator('BOOK_ADDED')
+}
+
 module.exports = {
   addBook,
   bookCount,
   filterBooks,
   allGenres,
+  bookAdded,
 }

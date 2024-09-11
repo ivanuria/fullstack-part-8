@@ -1,5 +1,8 @@
 const { GraphQLError } = require('graphql')
 
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
+
 const Author = require('../models/author')
 
 const editAuthor = async (root, { name, setBornTo }, { currentUser, requireLogin }) => {
@@ -23,6 +26,8 @@ const editAuthor = async (root, { name, setBornTo }, { currentUser, requireLogin
     })
   }
 
+  pubsub.publish('AUTHOR_EDITED', { authorEdited: editedAuthor })
+
   return editedAuthor
 }
 
@@ -32,8 +37,13 @@ const allAuthors = async () => {
   return Author.find({})
 }
 
+const authorEdited = {
+  subscribe: () => pubsub.asyncIterator('AUTHOR_EDITED')
+}
+
 module.exports = {
   editAuthor,
   authorCount,
-  allAuthors
+  allAuthors,
+  authorEdited,
 }
