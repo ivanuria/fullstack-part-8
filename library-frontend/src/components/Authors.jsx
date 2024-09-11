@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
-import { ALL_AUTHORS, EDIT_AUTHOR } from '../controllers/queries'
+import { ALL_AUTHORS, EDIT_AUTHOR, AUTHOR_EDITED } from '../controllers/queries'
 import { useNavigate, useLocation } from 'react-router-dom'
 import useStore from '../controllers/useStore'
 import useLoggedUser from '../utils/useLoggedUser'
+import { useSubscription } from '@apollo/client'
 // MUI
 import {
   Box,
@@ -31,26 +32,25 @@ const SetBorn = ({ name, born }) => {
   const { name:userName, saveLogout } = useLoggedUser()
   const navigate = useNavigate()
   const location = useLocation()
-  const params = new URLSearchParams({  redirect: location.pathname })
+  const params = new URLSearchParams({ redirect: location.pathname })
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
-      onError: async (error) => {
-        const messages = error.graphQLErrors.map(e => e.message).join('\n')
-        if (error.message.toLowerCase().includes('unauthorised')) {
-          await saveLogout()
-          navigate(`/login?${params.toString()}`)
-        }
-        setError(messages)
-      },
-      onCompleted: () => {
-        setFocused(false)
-        setSuccess(`Born date of ${name} correctly saved to ${newBorn}`)
-      },
-      refetchQueries: [
-        { query: ALL_AUTHORS }
-      ]
-    }
-  )
+    onError: async (error) => {
+      const messages = error.graphQLErrors.map(e => e.message).join('\n')
+      if (error.message.toLowerCase().includes('unauthorised')) {
+        await saveLogout() // Although VSCode says await does not work here... it does.
+        navigate(`/login?${params.toString()}`)
+      }
+      setError(messages)
+    },
+    onCompleted: () => {
+      setFocused(false)
+      setSuccess(`Born date of ${name} correctly saved to ${newBorn}`)
+    },
+    /*refetchQueries: [
+      { query: ALL_AUTHORS }
+    ]*/
+  })
 
   const onCancel = () => {
     setNewBorn(born)
@@ -60,6 +60,11 @@ const SetBorn = ({ name, born }) => {
   const onSave = () => {
     editAuthor({ variables: { name, setBornTo: parseInt(newBorn) } })
   }
+
+  useEffect(() => {
+    setNewBorn(born)
+  }, [born])
+
   if (!userName) {
     return (
       <TableCell
@@ -135,6 +140,25 @@ const SetBorn = ({ name, born }) => {
 
 const Authors = () => {
   const query = useQuery(ALL_AUTHORS)
+
+  useSubscription(AUTHOR_EDITED, {
+    onData: ({ data, client }) => {
+      const authorEdited = data.data.authorEdited
+      console.log('received', authorEdited)
+      client.cache.updateQuery({ query: ALL_AUTHORS }, (store) => {
+        const allAuthors = store && store.allAuthors
+        console.log('allAuthors', allAuthors)
+        if (allAuthors) {
+          return { allAuthors: allAuthors.map(
+            author =>
+            author.id !== authorEdited.id
+            ? author
+            : authorEdited
+          ) }
+        }
+      })
+    }
+  })
 
   return (
     <Box>

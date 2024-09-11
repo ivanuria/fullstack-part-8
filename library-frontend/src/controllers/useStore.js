@@ -14,6 +14,7 @@ const useStore = create(persist(
       severityMessage: '',
       setError: (message) => set(state => ({ message, openMessage: true, severityMessage: 'error' })),
       setSuccess: (message) => set(state => ({ message, openMessage: true, severityMessage: 'success' })),
+      setInfo: (message) => set(state => ({ message, openMessage: true, severityMessage: 'info' })),
       closeMessage: () => set(state => ({ error: '', openMessage: false, severityMessage: '' })),
       setUserName: (name) => set(state => ({ userName: name })),
       setUserToken: (token) => set(state => ({ userToken: token })),

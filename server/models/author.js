@@ -25,5 +25,6 @@ schema.virtual('bookCount', {
 
 schema.plugin(uniqueValidator)
 schema.plugin(autopopulate)
+schema.options.selectPopulatedPaths = false
 
 module.exports = mongoose.model('Author', schema)

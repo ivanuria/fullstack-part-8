@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
-import { ADD_BOOK, ALL_AUTHORS, ALL_BOOKS, ALL_GENRES } from '../controllers/queries'
+import { ADD_BOOK, ALL_BOOKS, ALL_GENRES } from '../controllers/queries'
 import useStore from '../controllers/useStore'
 import { useNavigate, useLocation } from 'react-router-dom'
 import useLoggedUser from '../utils/useLoggedUser'
@@ -27,7 +27,7 @@ const NewBook = () => {
 
   const location = useLocation()
   const params = new URLSearchParams({
-    redirect: location
+    redirect: location.pathname
   })
 
   const [createBook] = useMutation(ADD_BOOK, {
@@ -49,45 +49,11 @@ const NewBook = () => {
       navigate('/books')
     },
     update: async (cache, { data }) => {
-      // Update Authors // It works, but not if Authors aren't fetched before
-      await cache.updateQuery({ query: ALL_AUTHORS }, (store) => {
-        const allAuthors = store && store.allAuthors
-        if (allAuthors) {
-          const newAuthor = data.addBook.author
-          if (allAuthors.find(author => author.id === newAuthor.id)) {
-            return {
-              allAuthors:
-                allAuthors.map(author =>
-                author.id !== newAuthor.id
-                ? author
-                : newAuthor
-              )
-            }
-          }
-          return {
-            allAuthors: allAuthors.concat(newAuthor)
-          }
-        }
-      })
-      // Update Genres
-      await cache.updateQuery({ query: ALL_GENRES }, (store) => {
-        const allGenres = store && store.allGenres
-        if (allGenres) {
-          let newGenres = [...allGenres.value]
-          for (let genre of data.addBook.genres) {
-            newGenres.push(genre.toLowerCase())
-          }
-          newGenres = [...new Set(newGenres)]
-          newGenres.sort()
-          return {
-            allGenres: { __typename: 'Genre', value: newGenres }
-          }
-        }
-      })
       // Update Books
       await cache.updateQuery({ query: ALL_BOOKS }, (store) => {
         const allBooks = store && store.allBooks
         if (allBooks) {
+          if (allBooks.find(book => book.id === data.addBook.id)) return { allBooks }
           return { allBooks: allBooks.concat(data.addBook) }
         }
       })
@@ -105,7 +71,7 @@ const NewBook = () => {
   }
 
   useEffect(() => {
-    if (!userName) navigate('/')
+    if (!userName) navigate('/login')
   }, [userName])
 
   return (
